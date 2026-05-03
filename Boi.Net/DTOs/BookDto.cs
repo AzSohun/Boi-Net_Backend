@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Boi.Net.Model
+namespace Boi.Net.DTOs
 {
-    public class Book
+    public class BookDto
     {
 
         public int Id { get; set; }
@@ -22,7 +22,7 @@ namespace Boi.Net.Model
         public string? Publisher { get; set; }
 
         public string? ISBN { get; set; }
-        
+
         public decimal Price { get; set; }
 
         public string? ImageUrl { get; set; }
@@ -34,8 +34,6 @@ namespace Boi.Net.Model
         public bool IsAvailable { get; set; } = true;
 
         public DateOnly? PublishDate { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
 
     }
 }
