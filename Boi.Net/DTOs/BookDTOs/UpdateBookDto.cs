@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Boi.Net.DTOs
+namespace Boi.Net.DTOs.BookDTOs
 {
-    public class BookDto
+    public class UpdateBookDto
     {
-
-        public int Id { get; set; }
 
         [Required]
         [MaxLength(200)]
@@ -37,3 +35,8 @@ namespace Boi.Net.DTOs
 
     }
 }
+
+
+
+// This Dto is for update a current book information.
+
