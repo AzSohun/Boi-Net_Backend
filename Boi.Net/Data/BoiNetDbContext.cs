@@ -11,7 +11,6 @@ namespace Boi.Net.Data
             
         }
 
-
         public DbSet<Book> Books { get; set; }
 
     }

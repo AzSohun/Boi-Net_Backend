@@ -9,12 +9,10 @@ namespace Boi.Net.Services
     {
 
         private readonly BoiNetDbContext _context;
-        private readonly IMapper _mapper;
 
-        public BookService(BoiNetDbContext context, IMapper mapper)
+        public BookService(BoiNetDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
 
@@ -108,8 +106,6 @@ namespace Boi.Net.Services
             var existingBook = _context.Books.FirstOrDefaultAsync(book => book.Id == id);
 
             if(existingBook != null) {
-
-                _mapper.Map<Book>(updatedBook);
 
                 await _context.SaveChangesAsync();
 
