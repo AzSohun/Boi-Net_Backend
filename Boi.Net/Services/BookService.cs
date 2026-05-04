@@ -59,7 +59,7 @@ namespace Boi.Net.Services
                 query = query.Where(book => book.IsAvailable == filterIsAvailable.Value);
             }
 
-            query = asc ? query.OrderBy(b => b.Title) : query.OrderByDescending(book => book.Title);
+            query = asc ? query.OrderBy(b => b.CreatedAt) : query.OrderByDescending(book => book.CreatedAt);
 
             var books = await query.Skip((pageCount - 1) * pageSize).Take(pageSize).ToListAsync();
 
