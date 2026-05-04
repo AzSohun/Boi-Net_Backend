@@ -34,35 +34,32 @@ namespace Boi.Net.Services
             // Search
             if (!string.IsNullOrWhiteSpace(searchTitle))
             {
-                query = _context.Books.Where(book => book.Title.Contains(searchTitle));
+                query = query.Where(book => book.Title.Contains(searchTitle));
             }
 
 
             // Filter
             if (!string.IsNullOrWhiteSpace(filterGenre))
             {
-                query = _context.Books.Where(book => book.Genre == filterGenre);
+                query = query.Where(book => book.Genre == filterGenre);
             }
 
             if (!string.IsNullOrWhiteSpace(filterAuthor))
             {
-                query = _context.Books.Where(book => book.Author == filterAuthor);
+                query = query.Where(book => book.Author == filterAuthor);
             }
 
             if (!string.IsNullOrWhiteSpace(filterIsbn))
             {
-                query = _context.Books.Where(book => book.ISBN == filterIsbn);
+                query = query.Where(book => book.ISBN == filterIsbn);
             }
 
-            if ((bool)filterIsAvailable!)
+            if (filterIsAvailable.HasValue)
             {
-                query = _context.Books.Where(book => book.IsAvailable == filterIsAvailable);
+                query = query.Where(book => book.IsAvailable == filterIsAvailable.Value);
             }
 
-            if ((bool)!asc)
-            {
-                query = query.OrderDescending();
-            }
+            query = asc ? query.OrderBy(b => b.Title) : query.OrderByDescending(book => book.Title);
 
             var books = await query.Skip((pageCount - 1) * pageSize).Take(pageSize).ToListAsync();
 
@@ -74,7 +71,9 @@ namespace Boi.Net.Services
         public async Task<Book?> GetBookById(int id)
         {
 
-            return await _context.Books.FirstOrDefaultAsync(book => book.Id == id);
+            var book = await _context.Books.FirstOrDefaultAsync(book => book.Id == id);
+
+            return book;
 
         }
 
@@ -82,35 +81,36 @@ namespace Boi.Net.Services
         public async Task<Book?> GetBookByISBN(string ISBN)
         {
 
-            return await _context.Books.FirstOrDefaultAsync(book => book.ISBN == ISBN);
+            var book = await _context.Books.FirstOrDefaultAsync(book => book.ISBN == ISBN);
+
+            return book;
 
         }
 
 
         // To Create Book
-        public async Task CreateBook(Book book)
+        public async Task CreateBook(Book newBook)
         {
-            await _context.Books.AddAsync(book);
+
+            await _context.Books.AddAsync(newBook);
             await _context.SaveChangesAsync();
         }
 
 
         // To Update Book
-        public async Task<Book?> UpdateBook(Book updatedBook)
+        public async Task UpdateBook()
         {
-            await _context.SaveChangesAsync();
 
-            return updatedBook;
+            await _context.SaveChangesAsync();
         }
 
 
         // To Delete Book
-        public async Task<string> DeleteBook(Book existingBook)
+        public async Task DeleteBook(Book existingBook)
         {
             _context.Remove(existingBook);
             await _context.SaveChangesAsync();
 
-            return "Book Has Been Deleted.";
         }
     }
 }
