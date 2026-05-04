@@ -18,9 +18,9 @@ namespace Boi.Net.Services
 
         // To Get All The Books
         public async Task<List<Book>> GetAll(
-            string? searchTitle, 
-            string? filterGenre, 
-            string? filterAuthor, 
+            string? searchTitle,
+            string? filterGenre,
+            string? filterAuthor,
             string? filterIsbn,
             decimal? filerPrice,
             bool? filterIsAvailable,
@@ -62,7 +62,7 @@ namespace Boi.Net.Services
 
             if ((bool)filterIsAvailable!)
             {
-                query = _context.Books.Where(book => book.IsAvailable == filterIsAvailable); 
+                query = _context.Books.Where(book => book.IsAvailable == filterIsAvailable);
             }
 
 
@@ -92,45 +92,27 @@ namespace Boi.Net.Services
         // To Create Book
         public async Task CreateBook(Book book)
         {
-
             await _context.Books.AddAsync(book);
             await _context.SaveChangesAsync();
-
         }
 
 
         // To Update Book
-        public async Task<Book?> UpdateBook(int id, Book updatedBook)
+        public async Task<Book?> UpdateBook(Book updatedBook)
         {
+            await _context.SaveChangesAsync();
 
-            var existingBook = _context.Books.FirstOrDefaultAsync(book => book.Id == id);
-
-            if(existingBook != null) {
-
-                await _context.SaveChangesAsync();
-
-                return updatedBook;
-            
-            }
-
-            return null;  
+            return updatedBook;
         }
 
 
         // To Delete Book
-        public async Task<string> DeleteBook(int id)
+        public async Task<string> DeleteBook(Book existingBook)
         {
-            var existingBook = await _context.Books.FirstOrDefaultAsync(book => book.Id == id);
+            _context.Remove(existingBook);
+            await _context.SaveChangesAsync();
 
-            if(existingBook != null)
-            {
-                _context.Remove(existingBook);
-                await _context.SaveChangesAsync();
-
-                return "Book Has Been Deleted.";
-            }
-
-            return "Book Not Found.";
+            return "Book Has Been Deleted.";
         }
     }
 }
