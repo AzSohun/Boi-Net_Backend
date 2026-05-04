@@ -1,6 +1,7 @@
 using Boi.Net.Data;
 using Boi.Net.Exceptions;
 using Boi.Net.Services;
+using Boi.Net.Settings;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -13,6 +14,13 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<BoiNetDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+
+// Mapping from AppSettings to CloudinarySetting
+builder.Services.Configure<CloudinarySetting>(builder.Configuration.GetSection("CloudinarySetting"));
+// Add the Photo Services
+builder.Services.AddScoped<IPhotoService, PhotoService>();
+
 builder.Services.AddScoped<BookService>();
 
 
