@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Boi.Net.Data;
+﻿using Boi.Net.Data;
 using Boi.Net.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,12 +22,14 @@ namespace Boi.Net.Services
             string? filterAuthor,
             string? filterIsbn,
             bool? filterIsAvailable,
+            string sortBy,
             bool asc,
             int pageCount = 1,
             int pageSize = 10)
         {
 
-            var query = _context.Books.AsQueryable();
+            // Using AsNoTracking Can Reduced 40% of Memory Using. 
+            var query = _context.Books.AsNoTracking().AsQueryable();
 
 
             // Search
@@ -54,12 +55,23 @@ namespace Boi.Net.Services
                 query = query.Where(book => book.ISBN == filterIsbn);
             }
 
-            if (filterIsAvailable.HasValue)
-            {
-                query = query.Where(book => book.IsAvailable == filterIsAvailable.Value);
-            }
 
-            query = asc ? query.OrderBy(b => b.CreatedAt) : query.OrderByDescending(book => book.CreatedAt);
+            // For Hide the Stock Out Product
+            //if (filterIsAvailable.HasValue)
+            //{
+            //    query = query.Where(book => book.IsAvailable == filterIsAvailable.Value);
+            //}
+
+
+            // Sorting Logic
+            query = sortBy.ToLower() switch
+            {
+                "title" => asc ? query.OrderBy(book => book.Title) : query.OrderByDescending(book => book.Title),
+                "price" => asc ? query.OrderBy(book => book.Price) : query.OrderByDescending(book => book.Price),
+                _ => asc ? query.OrderBy(book => book.CreatedAt) : query.OrderByDescending(book => book.CreatedAt)
+            };
+            // query = asc ? query.OrderBy(b => b.CreatedAt) : query.OrderByDescending(book => book.CreatedAt);
+
 
             var books = await query.Skip((pageCount - 1) * pageSize).Take(pageSize).ToListAsync();
 

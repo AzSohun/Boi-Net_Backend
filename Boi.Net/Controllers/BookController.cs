@@ -29,12 +29,13 @@ namespace Boi.Net.Controllers
             [FromQuery] string author = "",
             [FromQuery] string isbn = "",
             [FromQuery] bool isavailable = true,
+            [FromQuery] string sortBy = "date",
             [FromQuery] bool asc = true,
             [FromQuery] int pagecount = 1,
             [FromQuery] int pagesize = 10)
         {
 
-            var allBooks = await _service.GetAllBooks(search, genre, author, isbn, isavailable, asc, pagecount, pagesize);
+            var allBooks = await _service.GetAllBooks(search, genre, author, isbn, isavailable, sortBy, asc, pagecount, pagesize);
 
             return Ok(allBooks);
 
@@ -58,7 +59,7 @@ namespace Boi.Net.Controllers
         }
 
 
-        [HttpGet("/isbn/{isbn}")]
+        [HttpGet("isbn/{isbn}")]
         public async Task<ActionResult<Book>> GetByIsbn(string isbn)
         {
 
@@ -92,7 +93,7 @@ namespace Boi.Net.Controllers
             await _service.CreateBook(newBook);
 
 
-            return Ok($"Book Created Successfully.");
+            return Ok(newBook);
 
         }
 
@@ -112,7 +113,7 @@ namespace Boi.Net.Controllers
 
             await _service.UpdateBook();
 
-            return Ok($"Book Updated Successfully. {updatedBook}");
+            return Ok(updatedBook);
             
         }
 
