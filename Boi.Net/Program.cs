@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<BoiNetDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));

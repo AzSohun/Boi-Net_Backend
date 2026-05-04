@@ -17,14 +17,13 @@ namespace Boi.Net.Services
 
 
         // To Get All The Books
-        public async Task<List<Book>> GetAll(
+        public async Task<List<Book>> GetAllBooks(
             string? searchTitle,
             string? filterGenre,
             string? filterAuthor,
             string? filterIsbn,
-            decimal? filerPrice,
             bool? filterIsAvailable,
-            DateOnly? filterPublishDate,
+            bool asc,
             int pageCount = 1,
             int pageSize = 10)
         {
@@ -55,16 +54,15 @@ namespace Boi.Net.Services
                 query = _context.Books.Where(book => book.ISBN == filterIsbn);
             }
 
-            if (filerPrice < 0)
-            {
-                query = _context.Books.Where(book => book.Price == filerPrice);
-            }
-
             if ((bool)filterIsAvailable!)
             {
                 query = _context.Books.Where(book => book.IsAvailable == filterIsAvailable);
             }
 
+            if ((bool)!asc)
+            {
+                query = query.OrderDescending();
+            }
 
             var books = await query.Skip((pageCount - 1) * pageSize).Take(pageSize).ToListAsync();
 
@@ -73,7 +71,7 @@ namespace Boi.Net.Services
 
 
         // To Get Book By Id
-        public async Task<Book?> GetById(int id)
+        public async Task<Book?> GetBookById(int id)
         {
 
             return await _context.Books.FirstOrDefaultAsync(book => book.Id == id);
