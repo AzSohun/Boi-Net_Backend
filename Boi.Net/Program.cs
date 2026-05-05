@@ -17,7 +17,8 @@ builder.Services.AddDbContext<BoiNetDbContext>(options => options.UseSqlServer(b
 
 
 // Mapping from AppSettings to CloudinarySetting
-builder.Services.Configure<CloudinarySetting>(builder.Configuration.GetSection("CloudinarySetting"));
+//builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings")); <--- Previously I Wrote this
+builder.Services.Configure<Boi.Net.Settings.CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 // Add the Photo Services
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 

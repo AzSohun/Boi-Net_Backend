@@ -23,7 +23,7 @@ namespace Boi.Net.DTOs.BookDTOs
 
         public decimal Price { get; set; }
 
-        public string? ImageUrl { get; set; }
+        public IFormFile? ImageFile { get; set; }
 
         public int? PageCount { get; set; }
 

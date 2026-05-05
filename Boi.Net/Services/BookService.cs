@@ -1,4 +1,5 @@
-﻿using Boi.Net.Data;
+﻿using AutoMapper;
+using Boi.Net.Data;
 using Boi.Net.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,10 +9,12 @@ namespace Boi.Net.Services
     {
 
         private readonly BoiNetDbContext _context;
+        private readonly IPhotoService _photoService;
 
-        public BookService(BoiNetDbContext context)
+        public BookService(BoiNetDbContext context, IPhotoService photoService)
         {
             _context = context;
+            _photoService = photoService;
         }
 
 
@@ -101,8 +104,23 @@ namespace Boi.Net.Services
 
 
         // To Create Book
-        public async Task CreateBook(Book newBook)
+        public async Task CreateBook(Book newBook, IFormFile? imageFile)
         {
+
+            if(imageFile != null)
+            {
+
+                var uploadImageUrl = await _photoService.AddPhotoAsync(imageFile);
+
+                if(uploadImageUrl.Error != null)
+                {
+                    throw new Exception(uploadImageUrl.Error.Message);
+                }
+
+                newBook.CoverPhoto = uploadImageUrl.SecureUrl.ToString();
+                newBook.CoverPublicId = uploadImageUrl.PublicId;
+
+            }
 
             await _context.Books.AddAsync(newBook);
             await _context.SaveChangesAsync();
@@ -110,8 +128,29 @@ namespace Boi.Net.Services
 
 
         // To Update Book
-        public async Task UpdateBook()
+        public async Task UpdateBook(Book book, IFormFile? imageFile)
         {
+
+            if(imageFile != null)
+            {
+
+                if (!string.IsNullOrWhiteSpace(book.CoverPublicId))
+                {
+                    await _photoService.DeletePhotoAsync(book.CoverPublicId);
+                }
+
+                var uploadImageUrl = await _photoService.AddPhotoAsync(imageFile);
+
+                if (uploadImageUrl.Error != null)
+                {
+                    throw new Exception(uploadImageUrl.Error.Message);
+                }
+
+                book.CoverPhoto = uploadImageUrl.SecureUrl.ToString();
+                book.CoverPublicId = uploadImageUrl.PublicId;
+
+            }
+
 
             await _context.SaveChangesAsync();
         }

@@ -4,7 +4,6 @@ namespace Boi.Net.Model
 {
     public class Book
     {
-
         public int Id { get; set; }
 
         [Required]
@@ -25,7 +24,8 @@ namespace Boi.Net.Model
         
         public decimal Price { get; set; }
 
-        public string? ImageUrl { get; set; }
+        public string? CoverPhoto { get; set; }
+        public string? CoverPublicId { get; set; }
 
         public int? PageCount { get; set; }
 
@@ -36,6 +36,5 @@ namespace Boi.Net.Model
         public DateOnly? PublishDate { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
-
     }
 }

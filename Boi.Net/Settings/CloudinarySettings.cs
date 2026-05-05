@@ -1,6 +1,6 @@
 ﻿namespace Boi.Net.Settings
 {
-    public class CloudinarySetting
+    public class CloudinarySettings
     {
 
         // Step 1: Setup a Cloudinary Helper Model Class.

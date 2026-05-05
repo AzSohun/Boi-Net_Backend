@@ -76,7 +76,7 @@ namespace Boi.Net.Controllers
 
 
         [HttpPost("create")]
-        public async Task<ActionResult> Create([FromBody] CreateBookDto createBookDto)
+        public async Task<ActionResult> Create([FromForm] CreateBookDto createBookDto)
         {
 
             var book = await _service.GetBookByISBN(createBookDto.ISBN!);
@@ -90,7 +90,7 @@ namespace Boi.Net.Controllers
 
             var newBook = _mapper.Map<Book>(createBookDto);
 
-            await _service.CreateBook(newBook);
+            await _service.CreateBook(newBook, createBookDto.ImageFile);
 
 
             return Ok(newBook);
@@ -99,7 +99,7 @@ namespace Boi.Net.Controllers
 
 
         [HttpPut("update/{id}")]
-        public async Task<ActionResult> Update(int id, [FromBody] UpdateBookDto bookUpdate)
+        public async Task<ActionResult> Update(int id, [FromForm] UpdateBookDto bookUpdate)
         {
 
             var existingBook = await _service.GetBookById(id);
@@ -111,7 +111,7 @@ namespace Boi.Net.Controllers
 
             var updatedBook = _mapper.Map(bookUpdate, existingBook);
 
-            await _service.UpdateBook();
+            await _service.UpdateBook(updatedBook, bookUpdate.ImageFile);
 
             return Ok(updatedBook);
             

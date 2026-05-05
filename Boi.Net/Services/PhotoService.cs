@@ -14,7 +14,7 @@ namespace Boi.Net.Services
 
 
         // PhotoService Constructor
-        public PhotoService(IOptions<CloudinarySetting> config)
+        public PhotoService(IOptions<CloudinarySettings> config)
         {
 
             // Get All The Value From AppSettiongs using IOptions and Inject into the account.

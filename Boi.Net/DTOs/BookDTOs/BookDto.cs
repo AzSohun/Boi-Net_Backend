@@ -4,7 +4,6 @@ namespace Boi.Net.DTOs.BookDTOs
 {
     public class BookDto
     {
-
         public int Id { get; set; }
 
         [Required]
@@ -25,7 +24,8 @@ namespace Boi.Net.DTOs.BookDTOs
 
         public decimal Price { get; set; }
 
-        public string? ImageUrl { get; set; }
+        public string? CoverPhoto { get; set; }
+        public string? CoverPublicId { get; set; }
 
         public int? PageCount { get; set; }
 
