@@ -9,7 +9,6 @@ namespace Boi.Net.DTOs.UserDTOs
 
         public DateOnly? DOB { get; set; }
 
-        // ফাইলের জন্য সঠিক নাম
         public IFormFile? ProfilePhoto { get; set; }
     }
 }
