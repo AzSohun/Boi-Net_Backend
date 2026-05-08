@@ -1,7 +1,8 @@
-﻿using Boi.Net.Model;
+﻿using Boi.Net.DTOs.BookDTOs;
+using Boi.Net.Model;
 using System.ComponentModel.DataAnnotations;
 
-namespace Boi.Net.DTOs.BookDTOs
+namespace Boi.Net.DTOs.AuthDTOs
 {
     public class UserDto
     {
