@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Boi.Net.Services
@@ -79,7 +80,7 @@ namespace Boi.Net.Services
 
 
         // Create Token
-        private string CreateAccessToken(User user)
+        public string CreateAccessToken(User user)
         {
 
             var claim = new List<Claim>()
@@ -107,7 +108,14 @@ namespace Boi.Net.Services
         }
 
 
+        public string CreateRefreshToken()
+        {
+            var randomNumber = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
 
+            return Convert.ToBase64String(randomNumber);
+        }
     
 
     }
