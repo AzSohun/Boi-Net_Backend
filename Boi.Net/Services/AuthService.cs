@@ -2,6 +2,7 @@
 using Boi.Net.DTOs.AuthDTOs;
 using Boi.Net.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Boi.Net.Services
 {
@@ -45,6 +46,47 @@ namespace Boi.Net.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+
+
+        // Login Service
+        public async Task<bool> Login(LoginDto loginDto)
+        {
+
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == loginDto.Email);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            bool isPsswordMatched = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
+
+            if (!isPsswordMatched)
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+
+
+        // Create Token
+        private string CreateToken(User user)
+        {
+
+            var claim = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, user.Name)
+            };
+
+            
+
+
+            return "";
+
         }
     
 
