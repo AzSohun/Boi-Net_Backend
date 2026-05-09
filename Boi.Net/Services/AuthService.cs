@@ -57,30 +57,42 @@ namespace Boi.Net.Services
 
 
         // Login Service
-        public async Task<bool> Login(LoginDto loginDto)
+        public async Task<object> Login(LoginDto loginDto)
         {
 
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == loginDto.Email);
 
             if (user == null)
             {
-                return false;
+                return null!;
             }
 
             bool isPsswordMatched = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
 
             if (!isPsswordMatched)
             {
-                return false;
+                return null!;
             }
 
-            return true;
+            var accessToken = CreateAccessToken(user);
+            var refreshToken = CreateRefreshToken();
+            
+            _context.Update(user);
+
+            var loggedInUser = new
+            {
+                user,
+                accessToken,
+                refreshToken
+            };
+
+            return loggedInUser;
 
         }
 
 
         // Create Token
-        public string CreateAccessToken(User user)
+        private string CreateAccessToken(User user)
         {
 
             var claim = new List<Claim>()
@@ -116,7 +128,5 @@ namespace Boi.Net.Services
 
             return Convert.ToBase64String(randomNumber);
         }
-    
-
     }
 }

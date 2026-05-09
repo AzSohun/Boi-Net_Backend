@@ -3,9 +3,12 @@ using Boi.Net.Exceptions;
 using Boi.Net.Model;
 using Boi.Net.Services;
 using Boi.Net.Settings;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,11 +29,22 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = true;
 
-    // ইউজারনেম/ইমেইল ইউনিক করার জন্য
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<BoiNetDbContext>()
 .AddDefaultTokenProviders();
 
+
+// JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+        ValidateIssuer = true,
+        ValidateAudience = true
+    };
+});
 
 // Mapping from AppSettings to CloudinarySetting
 //builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings")); <--- Previously I Wrote this

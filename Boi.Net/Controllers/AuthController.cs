@@ -36,5 +36,22 @@ namespace Boi.Net.Controllers
             return Ok(new {Message = "User Registration Successfull"});
 
         }
+
+
+        [HttpPost("Login")]
+        public async Task<ActionResult> Login([FromBody] LoginDto loginUser)
+        {
+
+            var user = await _service.Login(loginUser);
+
+            if(user == null)
+            {
+                return BadRequest("Invalid Credential");
+            }
+
+
+            return Ok(user);
+
+        }
     }
 }
