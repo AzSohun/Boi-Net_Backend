@@ -76,12 +76,22 @@ namespace Boi.Net.Services
 
             var accessToken = CreateAccessToken(user);
             var refreshToken = CreateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             
             _context.Update(user);
+            await _context.SaveChangesAsync();
 
             var loggedInUser = new
             {
-                user,
+                User = new
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    Role = user.UserRole.ToString()
+                },
                 accessToken,
                 refreshToken
             };
