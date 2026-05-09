@@ -16,35 +16,37 @@ namespace Boi.Net.Services
         }
 
 
-        // RegisterUser
-        public async Task<bool> Register(string Name, string Email, string Password)
+        // RegisterUser Service
+        public async Task<bool> Registration(RegistrationDto registration)
         {
+            // User এর জায়গায় Users দেওয়া হয়েছে
+            var isUserExist = await _context.Users.AnyAsync(user => user.Email == registration.Email);
 
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == Email);
-
-            if(user != null)
+            if (isUserExist)
             {
                 return false;
             }
-            if(user == null && _context.Users.ToListAsync() == null)
-            {
-                user?.UserRole = Role.SuperAdmin;
-            }
 
-            var PasswordHash = BCrypt.Net.BCrypt.HashPassword(Password);
+            var anyUserExists = await _context.Users.AnyAsync();
+            bool isFirstUser = !anyUserExists;
 
-            var newUser = new RegistrationDto
+            string PasswordHash = BCrypt.Net.BCrypt.HashPassword(registration.Password);
+
+            var newUser = new User
             {
-                Email = user?.Email!,
-                Name = user?.Name!,
-                Password = Password
+                Email = registration.Email,
+                UserName = registration.Email, // Identity-এর জন্য UserName রিকোয়ার্ড
+                Name = registration.Name,
+                PasswordHash = PasswordHash,
+                UserRole = isFirstUser ? Role.SuperAdmin : Role.User
             };
 
-            await _context.AddAsync(newUser);
+            await _context.Users.AddAsync(newUser);
+            await _context.SaveChangesAsync();
 
             return true;
-
         }
+    
 
     }
 }

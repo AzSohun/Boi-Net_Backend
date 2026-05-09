@@ -1,9 +1,10 @@
 ﻿using Boi.Net.Model;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Boi.Net.Data
 {
-    public class BoiNetDbContext: DbContext
+    public class BoiNetDbContext: IdentityDbContext<User>
     {
 
         public BoiNetDbContext(DbContextOptions<BoiNetDbContext> options): base(options)
@@ -12,7 +13,6 @@ namespace Boi.Net.Data
         }
 
         public DbSet<Book> Books { get; set; }
-        public DbSet<User> Users { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,6 +29,10 @@ namespace Boi.Net.Data
             modelBuilder.Entity<Book>()
                 .Property(book => book.Price)
                 .HasColumnType("decimal(18, 2)");
+
+            modelBuilder.Entity<User>()
+                .Property(user => user.UserRole)
+                .HasConversion<string>();
         }
 
     }

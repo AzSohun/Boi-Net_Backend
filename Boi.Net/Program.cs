@@ -1,7 +1,9 @@
 using Boi.Net.Data;
 using Boi.Net.Exceptions;
+using Boi.Net.Model;
 using Boi.Net.Services;
 using Boi.Net.Settings;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -13,7 +15,21 @@ builder.Services.AddControllers();
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
 builder.Services.AddOpenApi();
 
+
 builder.Services.AddDbContext<BoiNetDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = true;
+
+    // ইউজারনেম/ইমেইল ইউনিক করার জন্য
+    options.User.RequireUniqueEmail = true;
+}).AddEntityFrameworkStores<BoiNetDbContext>()
+.AddDefaultTokenProviders();
 
 
 // Mapping from AppSettings to CloudinarySetting
@@ -23,6 +39,7 @@ builder.Services.Configure<Boi.Net.Settings.CloudinarySettings>(builder.Configur
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 
 builder.Services.AddScoped<BookService>();
+builder.Services.AddScoped<AuthService>();
 
 
 
