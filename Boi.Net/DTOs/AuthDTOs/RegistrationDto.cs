@@ -14,7 +14,7 @@ namespace Boi.Net.DTOs.AuthDTOs
 
         [Required(ErrorMessage = "Password is required")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
-        public string PasswordHash { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
 
     }
 }

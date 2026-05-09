@@ -2,7 +2,7 @@
 using Boi.Net.Model;
 using System.ComponentModel.DataAnnotations;
 
-namespace Boi.Net.DTOs.AuthDTOs
+namespace Boi.Net.DTOs.UserDTOs
 {
     public class UserDto
     {

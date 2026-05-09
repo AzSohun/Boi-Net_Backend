@@ -1,6 +1,7 @@
 ﻿using Boi.Net.DTOs.BookDTOs;
+using Boi.Net.Model;
 
-namespace Boi.Net.DTOs.AuthDTOs
+namespace Boi.Net.DTOs.UserDTOs
 {
     public class UserProfileResponseDto
     {
