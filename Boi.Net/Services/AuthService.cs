@@ -2,7 +2,10 @@
 using Boi.Net.DTOs.AuthDTOs;
 using Boi.Net.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace Boi.Net.Services
 {
@@ -10,10 +13,12 @@ namespace Boi.Net.Services
     {
 
         private readonly BoiNetDbContext _context;
+        private readonly IConfiguration _config;
 
-        public AuthService(BoiNetDbContext context)
+        public AuthService(BoiNetDbContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
 
 
@@ -74,20 +79,35 @@ namespace Boi.Net.Services
 
 
         // Create Token
-        private string CreateToken(User user)
+        private string CreateAccessToken(User user)
         {
 
             var claim = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, user.Name)
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Email, user.Email!),
+                new Claim(ClaimTypes.Role, user.UserRole.ToString())
             };
 
-            
 
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-            return "";
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claim,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: credential
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
 
         }
+
+
+
     
 
     }
