@@ -53,5 +53,22 @@ namespace Boi.Net.Controllers
             return Ok(user);
 
         }
+
+
+
+        // Set Refresh Token into the Cookie
+        private void SetRefreshTokenInCookie(string refreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true, // Javascript's XSS will unable read the token
+                Expires = DateTime.UtcNow.AddDays(7), // Expire after 7 days
+                Secure = true, // HTTPS Only
+                SameSite = SameSiteMode.Strict // To protect from CPRF attack
+            };
+
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        }
+
     }
 }
