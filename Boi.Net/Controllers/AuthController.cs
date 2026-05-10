@@ -46,8 +46,8 @@ namespace Boi.Net.Controllers
             {
                 HttpOnly = true, // Javascript's XSS will unable read the token
                 Expires = DateTime.UtcNow.AddDays(7), // Expire after 7 days
-                Secure = true, // HTTPS Only
-                SameSite = SameSiteMode.Strict // To protect from CPRF attack
+                Secure = true, // HTTPS Only - Must be set true before deploy
+                SameSite = SameSiteMode.None // Set Strict before Deploy. To protect from CPRF attack
             };
 
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
@@ -98,7 +98,6 @@ namespace Boi.Net.Controllers
             {
                 AccessToken = authResult.AccessToken!
             });
-
         } 
     }
 }
