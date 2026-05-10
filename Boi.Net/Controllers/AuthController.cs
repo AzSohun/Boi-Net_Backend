@@ -38,26 +38,6 @@ namespace Boi.Net.Controllers
         }
 
 
-        [HttpPost("Login")]
-        public async Task<ActionResult> Login([FromBody] LoginDto loginUser)
-        {
-
-            var user = await _service.Login(loginUser);
-
-            if(user == null)
-            {
-                return BadRequest("Invalid Credential");
-            }
-
-
-            
-
-
-            return Ok(user);
-
-        }
-
-
 
         // Set Refresh Token into the Cookie
         private void SetRefreshTokenInCookie(string refreshToken)
@@ -73,5 +53,52 @@ namespace Boi.Net.Controllers
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
 
+
+
+        [HttpPost("Login")]
+        public async Task<ActionResult> Login([FromBody] LoginDto loginUser)
+        {
+
+            var user = await _service.Login(loginUser);
+
+            if(user == null)
+            {
+                return BadRequest("Invalid Credential");
+            }
+
+
+            SetRefreshTokenInCookie(user.RefreshToken!);
+
+
+            return Ok(user);
+        }
+
+
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult> RefreshToken()
+        {
+
+            string oldRefreshToken = Request.Cookies["refreshToken"]!;
+
+            if (string.IsNullOrWhiteSpace(oldRefreshToken))
+            {
+                return Unauthorized("Refresh Token is Missing in Browser.");
+            }
+
+            var authResult = await _service.GenerateNewTokens(oldRefreshToken);
+
+            if(authResult == null)
+            {
+                return Unauthorized("Invalid Refresh Token");
+            }
+
+            SetRefreshTokenInCookie(authResult.RefreshToken!);
+
+            return Ok(new
+            {
+                AccessToken = authResult.AccessToken!
+            });
+
+        } 
     }
 }
