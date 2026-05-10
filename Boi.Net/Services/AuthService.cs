@@ -138,5 +138,40 @@ namespace Boi.Net.Services
 
             return Convert.ToBase64String(randomNumber);
         }
+
+
+        public async Task<AuthResponseDto> GenerateNewTokens(string oldRefreshToken)
+        {
+
+            var user = await _context.Users.FirstOrDefaultAsync(user => user.RefreshToken == oldRefreshToken);
+
+            if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return null;
+            }
+
+            string newAccessToken = CreateAccessToken(user);
+            string newRefreshToken = CreateRefreshToken();
+
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+
+
+            return new AuthResponseDto
+            {
+                User = new
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    Role = user.UserRole
+                },
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
+        }
     }
 }
