@@ -57,7 +57,7 @@ namespace Boi.Net.Services
 
 
         // Login Service
-        public async Task<object> Login(LoginDto loginDto)
+        public async Task<AuthResponseDto> Login(LoginDto loginDto)
         {
 
             var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == loginDto.Email);
@@ -83,7 +83,7 @@ namespace Boi.Net.Services
             _context.Update(user);
             await _context.SaveChangesAsync();
 
-            var loggedInUser = new
+            var loggedInUser = new AuthResponseDto
             {
                 User = new
                 {
@@ -92,8 +92,8 @@ namespace Boi.Net.Services
                     Email = user.Email,
                     Role = user.UserRole.ToString()
                 },
-                accessToken,
-                refreshToken
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
             };
 
             return loggedInUser;
