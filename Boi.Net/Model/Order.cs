@@ -12,7 +12,6 @@ namespace Boi.Net.Model
 
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
-        [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
         public string OrderStatus { get; set; } = "Pending"; // Pending -> Proccesing -> Shipped -> Delivered
         public string PaymentStatus { get; set; } = "Unpaid"; // Unpaid, Paid, Failed

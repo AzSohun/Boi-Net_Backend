@@ -32,6 +32,15 @@ namespace Boi.Net.Data
                 .Property(book => book.Price)
                 .HasColumnType("decimal(18, 2)");
 
+            modelBuilder.Entity<Order>()
+                .Property(order => order.TotalAmount)
+                .HasColumnType("decimal(18, 2)");
+
+            modelBuilder.Entity<OrderItem>()
+                .Property(orderItem => orderItem.Price)
+                .HasColumnType("decimal(18, 2");
+
+
             modelBuilder.Entity<User>()
                 .Property(user => user.UserRole)
                 .HasConversion<string>();
