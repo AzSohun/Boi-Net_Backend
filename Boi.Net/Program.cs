@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using Stripe;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,7 +51,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["jwt:Audience"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
 
         ClockSkew = TimeSpan.Zero // When the token exipires it makes sure the authorization will invalid. 
     };
@@ -65,6 +66,7 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<BookService>();
 builder.Services.AddScoped<AuthService>();
 
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 
 // Global Exceptions Handler Services
