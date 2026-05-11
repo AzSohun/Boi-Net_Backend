@@ -2,6 +2,7 @@
 using Boi.Net.DTOs.BookDTOs;
 using Boi.Net.Model;
 using Boi.Net.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Boi.Net.Controllers
@@ -22,7 +23,7 @@ namespace Boi.Net.Controllers
 
 
         // Get All Books
-        [HttpGet]
+        [HttpGet("all-books")]
         public async Task<ActionResult<List<Book>>> GetAll(
             [FromQuery] string search = "",
             [FromQuery] string genre = "",
@@ -42,7 +43,7 @@ namespace Boi.Net.Controllers
         }
 
 
-
+        
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetById(int id)
         {
@@ -75,7 +76,18 @@ namespace Boi.Net.Controllers
         }
 
 
-        [HttpPost("create")]
+        [Authorize]
+        [HttpGet("my-wishlist")]
+        public async Task<ActionResult<Book>> MyWishlist()
+        {
+
+            return Ok(new { Message="Here is My Wishlist" });
+
+        }
+
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpPost("add-book")]
         public async Task<ActionResult> Create([FromForm] CreateBookDto createBookDto)
         {
 
@@ -97,7 +109,7 @@ namespace Boi.Net.Controllers
 
         }
 
-
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpPut("update/{id}")]
         public async Task<ActionResult> Update(int id, [FromForm] UpdateBookDto bookUpdate)
         {
@@ -118,6 +130,7 @@ namespace Boi.Net.Controllers
         }
 
 
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpDelete("delete/{id}")]
         public async Task<ActionResult> Delete(int id)
         {

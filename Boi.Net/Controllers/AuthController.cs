@@ -55,7 +55,7 @@ namespace Boi.Net.Controllers
 
 
 
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginDto loginUser)
         {
 
