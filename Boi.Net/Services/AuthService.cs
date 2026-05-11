@@ -147,7 +147,7 @@ namespace Boi.Net.Services
 
             if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
-                return null;
+                return null!;
             }
 
             string newAccessToken = CreateAccessToken(user);
