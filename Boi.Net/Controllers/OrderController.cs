@@ -1,5 +1,6 @@
 ﻿using Boi.Net.DTOs.OrderDTOs;
 using Boi.Net.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -18,6 +19,7 @@ namespace Boi.Net.Controllers
             _service = service;
         }
 
+        [Authorize]
         [HttpPost("place-order")]
         public async Task<ActionResult> PlaceeOrder([FromBody] CreateOrderDto createOrderDto)
         {
