@@ -33,6 +33,7 @@ namespace Boi.Net.Services
                 user.Name = updateUserDto.Name!;
             }
 
+
             if (updateUserDto.DOB.HasValue)
             {
                 user.DOB = updateUserDto.DOB;
@@ -73,6 +74,7 @@ namespace Boi.Net.Services
             {
                 Id = Guid.Parse(user.Id),
                 Name = user.Name,
+                Email = user.Email!,
                 DOB = user.DOB,
                 ProfilePhotoUrl = user.ProfilePhotoUrl,
                 UserRole = user.UserRole
