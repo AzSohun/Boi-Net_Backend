@@ -28,21 +28,13 @@ namespace Boi.Net.Controllers
         public async Task<ActionResult> CreatePaymentIntent(int orderId)
         {
 
-            try
-            {
-                // Get UserId from the Token
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Get UserId from the Token
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                // Get Client Secret from the Service Layer
-                var clientSecret = await _service.CreatePaymentIntentAsync(orderId, userId!);
+            // Get Client Secret from the Service Layer
+            var clientSecret = await _service.CreatePaymentIntentAsync(orderId, userId!);
 
-                return Ok(new { clientSecret });
-
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            return Ok(new { clientSecret });
 
         }
 

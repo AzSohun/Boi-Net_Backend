@@ -2,5 +2,7 @@
 {
     public class OrderItemDto
     {
+        public int BookId { get; set; }
+        public int Quatity { get; set; }
     }
 }

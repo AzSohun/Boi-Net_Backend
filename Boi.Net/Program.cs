@@ -66,7 +66,7 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<BookService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<PaymentService>();
-
+builder.Services.AddScoped<OrderService>();
 
 // Stripe Service
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
