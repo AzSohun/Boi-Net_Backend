@@ -84,5 +84,26 @@ namespace Boi.Net.Services
 
 
 
+        public async Task<bool> SoftDeleteMyAccountAsync(string userId)
+        {
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if(user == null || user.IsDeleted)
+            {
+                throw new Exception("User not found.");
+            }
+
+            user.IsDeleted = true;
+            user.RefreshToken = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded;
+
+        }
+
+
     }
 }
