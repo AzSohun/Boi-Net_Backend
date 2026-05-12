@@ -48,37 +48,48 @@ namespace Boi.Net.Controllers
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
             var endpointSecret = _config["Stripe:WebhookSecret"];
 
-            try 
-            {
+            // ডিবাগিং লগ: আসল সমস্যা ধরার জন্য
+            Console.WriteLine("\n--- WEBHOOK DEBUG START ---");
+            Console.WriteLine($"Secret from Config: '{endpointSecret}'");
+            Console.WriteLine($"JSON Body Length: {json.Length}");
+            Console.WriteLine($"Stripe Signature Header: {Request.Headers["Stripe-Signature"].ToString().Substring(0, 15)}...");
 
-                // Verify Signature
+            try
+            {
                 var stripeEvent = EventUtility.ConstructEvent(
                     json,
                     Request.Headers["Stripe-Signature"],
-                    endpointSecret
-                    );
+                    endpointSecret,
+                    throwOnApiVersionMismatch: false
+                );
 
-                if(stripeEvent.Type == "payment_intent.succeeded")
+                if (stripeEvent.Type == "payment_intent.succeeded")
                 {
-
                     var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
                     var orderIdStr = paymentIntent?.Metadata["OrderId"];
 
-
-                    if(int.TryParse(orderIdStr, out int ordedId))
+                    if (int.TryParse(orderIdStr, out int orderId))
                     {
-                        await _service.UpdateOrderPaymentStatusAsync(ordedId);
+                        await _service.UpdateOrderPaymentStatusAsync(orderId);
+                        Console.WriteLine($"SUCCESS: Order {orderId} updated to Paid!");
                     }
-
                 }
 
+                Console.WriteLine("--- WEBHOOK DEBUG END ---\n");
                 return Ok();
-
             }
-            catch(StripeException e)
+            catch (StripeException e)
             {
+                Console.WriteLine($"STRIPE ERROR: {e.Message}");
+                Console.WriteLine("--- WEBHOOK DEBUG END ---\n");
                 return BadRequest($"Webhook Error: {e.Message}");
-            };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"GENERAL ERROR: {ex.Message}");
+                Console.WriteLine("--- WEBHOOK DEBUG END ---\n");
+                return BadRequest($"General Error: {ex.Message}");
+            }
         }
 
 
