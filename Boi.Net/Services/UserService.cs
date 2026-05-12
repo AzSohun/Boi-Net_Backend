@@ -105,5 +105,36 @@ namespace Boi.Net.Services
         }
 
 
+        public async Task<bool> ManageUserByAdminAsync(string userId, AdminUpdateUserDto dto)
+        {
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if(user == null || user.IsBlocked)
+            {
+                throw new Exception("User not found.");
+            }
+
+            if(user.UserRole == Role.SuperAdmin)
+            {
+                throw new UnauthorizedAccessException("Super Admin role or status cannot be modified.");
+            }
+
+            user.UserRole = dto.UserRole;
+            user.IsBlocked = dto.IsBlocked;
+
+            if (user.IsBlocked)
+            {
+                user.RefreshToken = null;
+            }
+
+            user.UpdatedAt = DateTime.UtcNow;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            return result.Succeeded;
+
+        }
+
     }
 }
