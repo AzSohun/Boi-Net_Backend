@@ -2,6 +2,7 @@
 using Boi.Net.DTOs.BookDTOs;
 using Boi.Net.DTOs.OrderDTOs;
 using Boi.Net.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Boi.Net.Services
 {
@@ -59,6 +60,31 @@ namespace Boi.Net.Services
             return order;
 
         }
+
+
+
+        public async Task<object> GetMyPurchaseBookAsync(string userId)
+        {
+
+            var purchasedBook = await _context.OrderItems
+                .Where(orderItem => orderItem.Order!.UserId == userId && orderItem.Order.PaymentStatus == "Paid")
+                .Select(orderItem => new
+                {
+
+                    Book = orderItem.Book!.Id,
+                    Title = orderItem.Book.Title,
+                    Author = orderItem.Book.Author,
+                    CoverPhoto = orderItem.Book.CoverPhoto,
+                    PageCount = orderItem.Book.PageCount
+
+                })
+                .Distinct().ToListAsync();
+
+
+            return purchasedBook;
+
+        }
+
 
     }
 }
