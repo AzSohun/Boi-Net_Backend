@@ -41,13 +41,13 @@ namespace Boi.Net.Services
                 var orderItem = new OrderItem
                 {
                     BookId = book.Id,
-                    Quantity = item.Quatity,
+                    Quantity = item.Quantity,
                     Price = book.Price
                 };
 
                 order.OrderItems.Add(orderItem);
 
-                totalAmount += book.Price * item.Quatity;
+                totalAmount += book.Price * item.Quantity;
 
             };
 
