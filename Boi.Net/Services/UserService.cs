@@ -123,7 +123,7 @@ namespace Boi.Net.Services
             user.UserRole = dto.UserRole;
             user.IsBlocked = dto.IsBlocked;
 
-            if (user.IsBlocked)
+            if (dto.IsBlocked)
             {
                 user.RefreshToken = null;
             }
