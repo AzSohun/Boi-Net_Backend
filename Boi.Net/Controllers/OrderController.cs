@@ -35,5 +35,19 @@ namespace Boi.Net.Controllers
             });
 
         }
+
+
+        [Authorize]
+        [HttpGet("my-books")]
+        public async Task<ActionResult> GetMyBook()
+        {
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var book = await _service.GetMyPurchaseBookAsync(userId!);
+
+            return Ok(book);
+
+        }
     }
 }
