@@ -13,7 +13,7 @@ namespace Boi.Net.Model
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
         public decimal TotalAmount { get; set; }
-        public string OrderStatus { get; set; } = "Pending"; // Pending -> Proccesing -> Shipped -> Delivered
+        public string OrderStatus { get; set; } = "Pending"; // Pending -> Purchased
         public string PaymentStatus { get; set; } = "Unpaid"; // Unpaid, Paid, Failed
 
         public string? StripePaymentIntentId { get; set; } // The Tracking Id From Stripe

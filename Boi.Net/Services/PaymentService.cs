@@ -57,8 +57,8 @@ namespace Boi.Net.Services
 
             if(order != null)
             {
-                order.PaymentStatus = "Processing";
-                order.OrderStatus = "Paid";
+                order.PaymentStatus = "Paid";
+                order.OrderStatus = "Purchased";
                 await _context.SaveChangesAsync();
 
             }

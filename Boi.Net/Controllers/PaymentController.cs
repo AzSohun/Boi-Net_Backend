@@ -3,6 +3,7 @@ using Boi.Net.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
+using Stripe.V2.Core;
 using System.Security.Claims;
 
 namespace Boi.Net.Controllers
@@ -40,7 +41,6 @@ namespace Boi.Net.Controllers
 
 
 
-        // Recieve Payment Confirmation Endpoint from Stripe
         [AllowAnonymous]
         [HttpPost("webhook")]
         public async Task<ActionResult> StripeWebhook()
@@ -48,17 +48,19 @@ namespace Boi.Net.Controllers
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
             var endpointSecret = _config["Stripe:WebhookSecret"];
 
-            // ডিবাগিং লগ: আসল সমস্যা ধরার জন্য
-            Console.WriteLine("\n--- WEBHOOK DEBUG START ---");
-            Console.WriteLine($"Secret from Config: '{endpointSecret}'");
-            Console.WriteLine($"JSON Body Length: {json.Length}");
-            Console.WriteLine($"Stripe Signature Header: {Request.Headers["Stripe-Signature"].ToString().Substring(0, 15)}...");
+            var signatureHeader = Request.Headers["Stripe-Signature"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(signatureHeader))
+            {
+                Console.WriteLine("\n[ERROR] Stripe-Signature header is missing! Request did not come from Stripe.\n");
+                return BadRequest();
+            }
 
             try
             {
                 var stripeEvent = EventUtility.ConstructEvent(
                     json,
-                    Request.Headers["Stripe-Signature"],
+                    signatureHeader,
                     endpointSecret,
                     throwOnApiVersionMismatch: false
                 );
@@ -66,29 +68,27 @@ namespace Boi.Net.Controllers
                 if (stripeEvent.Type == "payment_intent.succeeded")
                 {
                     var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-                    var orderIdStr = paymentIntent?.Metadata["OrderId"];
 
-                    if (int.TryParse(orderIdStr, out int orderId))
+                    if (paymentIntent?.Metadata != null && paymentIntent.Metadata.TryGetValue("OrderId", out var orderIdStr))
                     {
-                        await _service.UpdateOrderPaymentStatusAsync(orderId);
-                        Console.WriteLine($"SUCCESS: Order {orderId} updated to Paid!");
+                        if (int.TryParse(orderIdStr, out int orderId))
+                        {
+                            await _service.UpdateOrderPaymentStatusAsync(orderId);
+                            Console.WriteLine($"\n[SUCCESS] Order {orderId} updated to Paid in DB!\n");
+                        }
                     }
                 }
-
-                Console.WriteLine("--- WEBHOOK DEBUG END ---\n");
                 return Ok();
             }
             catch (StripeException e)
             {
-                Console.WriteLine($"STRIPE ERROR: {e.Message}");
-                Console.WriteLine("--- WEBHOOK DEBUG END ---\n");
-                return BadRequest($"Webhook Error: {e.Message}");
+                Console.WriteLine($"\n[STRIPE ERROR] {e.Message}\n");
+                return BadRequest();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"GENERAL ERROR: {ex.Message}");
-                Console.WriteLine("--- WEBHOOK DEBUG END ---\n");
-                return BadRequest($"General Error: {ex.Message}");
+                Console.WriteLine($"\n--- CRITICAL WEBHOOK ERROR ---\nMESSAGE: {ex.Message}\nSTACK TRACE: {ex.StackTrace}\n");
+                return StatusCode(500);
             }
         }
 
