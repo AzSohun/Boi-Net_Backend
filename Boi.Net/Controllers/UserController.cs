@@ -41,6 +41,47 @@ namespace Boi.Net.Controllers
         }
 
 
+        [Authorize]
+        [HttpDelete("me")]
+        public async Task<IActionResult> DeleteMyProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+            if (userId == null)
+            {
+                return Unauthorized(new { Message = "You are not Authorized." });
+            }
+
+            var IsDelete = await _userService.SoftDeleteMyAccountAsync(userId);
+
+            if (IsDelete)
+            {
+                return BadRequest("Failed to Delete Successfully.");
+            }
+
+            return Ok(new
+            {
+                Message = "Profile Deleted Successful."
+            });
+        }
+
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpPut("admin/manage-user/{userId}")]
+        public async Task<ActionResult> ManageUser(string userId, [FromBody] AdminUpdateUserDto dto)
+        {
+
+            var result = await _userService.ManageUserByAdminAsync(userId, dto);
+
+            if (!result)
+            {
+                return Unauthorized(new { Message = "You are not authorized." });
+            }
+
+            return Ok(new {Message = "User Updated Successfully."});
+
+        }
 
 
 
