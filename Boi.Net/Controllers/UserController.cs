@@ -11,7 +11,6 @@ namespace Boi.Net.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-
         private readonly UserService _userService;
 
         public UserController(UserService userService)
@@ -19,71 +18,108 @@ namespace Boi.Net.Controllers
             _userService = userService;
         }
 
+        // 🚨 নতুন: TanStack Query-এর জন্য GET API
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<ActionResult> GetMyProfile()
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null) return Unauthorized(new { Message = "You are not Authorized" });
+
+                var result = await _userService.GetMyProfileAsync(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+        }
 
         [Authorize]
         [HttpPut("me")]
         public async Task<ActionResult> UpdateMyProfile([FromForm] UpdateUserDto dto)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if(userId == null)
+            try
             {
-                return Unauthorized("You are not Authorized");
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (userId == null)
+                {
+                    return Unauthorized(new { Message = "You are not Authorized" });
+                }
+
+                // 🚨 ফিক্স: আপডেট হওয়া ডেটা ফ্রন্টএন্ডে পাঠানো হচ্ছে
+                var updatedUser = await _userService.MyProfileUpdateAsync(userId, dto);
+
+                return Ok(new
+                {
+                    Message = "Profile updated successfully",
+                    User = updatedUser
+                });
             }
-
-            await _userService.MyProfileUpdateAsync(userId, dto);
-
-            return Ok(new
+            catch (Exception ex)
             {
-                Message= "Profile updated successfully" 
-            });
-
+                return BadRequest(new { Message = ex.Message });
+            }
         }
-
 
         [Authorize]
         [HttpDelete("me")]
         public async Task<IActionResult> DeleteMyProfile()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-
-            if (userId == null)
+            try
             {
-                return Unauthorized(new { Message = "You are not Authorized." });
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (userId == null)
+                {
+                    return Unauthorized(new { Message = "You are not Authorized." });
+                }
+
+                var isDelete = await _userService.SoftDeleteMyAccountAsync(userId);
+
+                // 🚨 ফিক্স: উল্টো লজিক ঠিক করা হয়েছে (!isDelete)
+                if (!isDelete)
+                {
+                    return BadRequest(new { Message = "Failed to Delete Successfully." });
+                }
+
+                return Ok(new
+                {
+                    Message = "Profile Deleted Successful."
+                });
             }
-
-            var IsDelete = await _userService.SoftDeleteMyAccountAsync(userId);
-
-            if (IsDelete)
+            catch (Exception ex)
             {
-                return BadRequest("Failed to Delete Successfully.");
+                return BadRequest(new { Message = ex.Message });
             }
-
-            return Ok(new
-            {
-                Message = "Profile Deleted Successful."
-            });
         }
-
 
         [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpPut("admin/manage-user/{userId}")]
         public async Task<ActionResult> ManageUser(string userId, [FromBody] AdminUpdateUserDto dto)
         {
-
-            var result = await _userService.ManageUserByAdminAsync(userId, dto);
-
-            if (!result)
+            try
             {
-                return Unauthorized(new { Message = "You are not authorized." });
+                var result = await _userService.ManageUserByAdminAsync(userId, dto);
+
+                if (!result)
+                {
+                    return BadRequest(new { Message = "Failed to update user." });
+                }
+
+                return Ok(new { Message = "User Updated Successfully." });
             }
-
-            return Ok(new {Message = "User Updated Successfully."});
-
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
         }
-
-
-
     }
 }
