@@ -60,9 +60,18 @@ builder.Services.AddAuthentication(options =>
 // Mapping from AppSettings to CloudinarySetting
 //builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings")); <--- Previously I Wrote this
 builder.Services.Configure<Boi.Net.Settings.CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
+
+// Redis Registration
+builder.Services.AddStackExchangeRedisCache(options => {
+
+    options.Configuration = builder.Configuration["ConnectionStrings:RedisConnection"];
+    options.InstanceName = "BoiNet_";
+});
+
+
 // Add the Photo Services
 builder.Services.AddScoped<IPhotoService, PhotoService>();
-
 builder.Services.AddScoped<BookService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<PaymentService>();
