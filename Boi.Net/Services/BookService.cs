@@ -2,6 +2,8 @@
 using Boi.Net.Data;
 using Boi.Net.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace Boi.Net.Services
 {
@@ -10,11 +12,13 @@ namespace Boi.Net.Services
 
         private readonly BoiNetDbContext _context;
         private readonly IPhotoService _photoService;
+        private readonly IDistributedCache _cache;
 
-        public BookService(BoiNetDbContext context, IPhotoService photoService)
+        public BookService(BoiNetDbContext context, IPhotoService photoService, IDistributedCache cache)
         {
             _context = context;
             _photoService = photoService;
+            _cache = cache;
         }
 
 
@@ -30,6 +34,17 @@ namespace Boi.Net.Services
             int pageCount = 1,
             int pageSize = 10)
         {
+
+
+            string cacheKey = $"BoiNet_Books_{searchTitle}_{filterGenre}_{filterAuthor}_{filterIsbn}_{filterIsAvailable}_{sortBy}_{asc}_{pageCount}_{pageSize}";
+
+            var cacheBooksString = await _cache.GetStringAsync(cacheKey);
+
+            if (!string.IsNullOrEmpty(cacheBooksString))
+            {
+                return JsonSerializer.Deserialize<List<Book>>(cacheBooksString)!;
+            }
+
 
             // Using AsNoTracking Can Reduced 40% of Memory Using. 
             var query = _context.Books.AsNoTracking().AsQueryable();
@@ -77,6 +92,14 @@ namespace Boi.Net.Services
 
 
             var books = await query.Skip((pageCount - 1) * pageSize).Take(pageSize).ToListAsync();
+
+
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+            };
+
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(books), cacheOptions);
 
             return books;
         }
