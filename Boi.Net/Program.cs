@@ -20,7 +20,7 @@ builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
 builder.Services.AddOpenApi();
 
 
-builder.Services.AddDbContext<BoiNetDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddDbContext<BoiNetDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
