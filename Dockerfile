@@ -12,6 +12,8 @@ RUN dotnet publish "Boi.Net/Boi.Net.csproj" -c Release -o /app/publish /p:UseApp
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 
+RUN apt-get update && apt-get install -y libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
+
 LABEL maintainer="Boi.Net Development Team"
 LABEL description="Boi.Net - Bookstore E-commerce Platform API"
 
