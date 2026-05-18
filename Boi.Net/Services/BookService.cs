@@ -22,6 +22,23 @@ namespace Boi.Net.Services
         }
 
 
+        private async Task<string> GetBookCacheVersionAsync()
+        {
+            var version = await _cache.GetStringAsync("BoiNet_BookCacheVersion");
+            if (string.IsNullOrEmpty(version))
+            {
+                version = Guid.NewGuid().ToString();
+                await _cache.SetStringAsync("BoiNet_BookCacheVersion", version);
+            }
+            return version;
+        }
+
+        private async Task InvalidateBookCacheAsync()
+        {
+            await _cache.SetStringAsync("BoiNet_BookCacheVersion", Guid.NewGuid().ToString());
+        }
+
+
         // To Get All The Books
         public async Task<List<Book>> GetAllBooks(
             string? searchTitle,
@@ -35,7 +52,7 @@ namespace Boi.Net.Services
             int pageSize = 10)
         {
 
-
+            string cacheVersion = await GetBookCacheVersionAsync();
             string cacheKey = $"BoiNet_Books_{searchTitle}_{filterGenre}_{filterAuthor}_{filterIsbn}_{filterIsAvailable}_{sortBy}_{asc}_{pageCount}_{pageSize}";
 
             var cacheBooksString = await _cache.GetStringAsync(cacheKey);
@@ -147,6 +164,7 @@ namespace Boi.Net.Services
 
             await _context.Books.AddAsync(newBook);
             await _context.SaveChangesAsync();
+            await InvalidateBookCacheAsync();
         }
 
 
@@ -176,6 +194,8 @@ namespace Boi.Net.Services
 
 
             await _context.SaveChangesAsync();
+            await InvalidateBookCacheAsync();
+
         }
 
 
@@ -184,6 +204,7 @@ namespace Boi.Net.Services
         {
             _context.Remove(existingBook);
             await _context.SaveChangesAsync();
+            await InvalidateBookCacheAsync();
 
         }
     }
