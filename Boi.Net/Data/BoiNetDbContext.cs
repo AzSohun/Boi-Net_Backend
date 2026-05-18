@@ -38,7 +38,7 @@ namespace Boi.Net.Data
 
             modelBuilder.Entity<OrderItem>()
                 .Property(orderItem => orderItem.Price)
-                .HasColumnType("decimal(18, 2");
+                .HasColumnType("decimal(18, 2)");
 
 
             modelBuilder.Entity<User>()
