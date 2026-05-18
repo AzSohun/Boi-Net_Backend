@@ -1,6 +1,7 @@
 ﻿using Boi.Net.Data;
 using Boi.Net.DTOs.AuthDTOs;
 using Boi.Net.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,64 +13,54 @@ namespace Boi.Net.Services
 {
     public class AuthService
     {
-
-        private readonly BoiNetDbContext _context;
+        private readonly UserManager<User> _userManager;
         private readonly IConfiguration _config;
 
-        public AuthService(BoiNetDbContext context, IConfiguration config)
+        public AuthService(UserManager<User> userManager, IConfiguration config)
         {
-            _context = context;
+            _userManager = userManager;
             _config = config;
         }
-
 
         // RegisterUser Service
         public async Task<bool> Registration(RegistrationDto registration)
         {
-            // User এর জায়গায় Users দেওয়া হয়েছে
-            var isUserExist = await _context.Users.AnyAsync(user => user.Email == registration.Email);
+            var isUserExist = await _userManager.FindByEmailAsync(registration.Email);
 
-            if (isUserExist)
+            if (isUserExist != null)
             {
                 return false;
             }
 
-            var anyUserExists = await _context.Users.AnyAsync();
+            var anyUserExists = await _userManager.Users.AnyAsync();
             bool isFirstUser = !anyUserExists;
-
-            string PasswordHash = BCrypt.Net.BCrypt.HashPassword(registration.Password);
 
             var newUser = new User
             {
                 Email = registration.Email,
-                UserName = registration.Email, // Identity-এর জন্য UserName রিকোয়ার্ড
+                UserName = registration.Email, 
                 Name = registration.Name,
-                PasswordHash = PasswordHash,
                 UserRole = isFirstUser ? Role.SuperAdmin : Role.User
             };
 
-            await _context.Users.AddAsync(newUser);
-            await _context.SaveChangesAsync();
+            var result = await _userManager.CreateAsync(newUser, registration.Password);
 
-            return true;
+            return result.Succeeded;
         }
-
-
 
         // Login Service
         public async Task<AuthResponseDto> Login(LoginDto loginDto)
         {
-
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == loginDto.Email);
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
 
             if (user == null)
             {
                 return null!;
             }
 
-            bool isPsswordMatched = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
+            bool isPasswordMatched = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
-            if (!isPsswordMatched)
+            if (!isPasswordMatched)
             {
                 return null!;
             }
@@ -79,9 +70,8 @@ namespace Boi.Net.Services
 
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-            
-            _context.Update(user);
-            await _context.SaveChangesAsync();
+
+            await _userManager.UpdateAsync(user);
 
             var loggedInUser = new AuthResponseDto
             {
@@ -97,14 +87,11 @@ namespace Boi.Net.Services
             };
 
             return loggedInUser;
-
         }
-
 
         // Create Token
         private string CreateAccessToken(User user)
         {
-
             var claim = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
@@ -112,7 +99,6 @@ namespace Boi.Net.Services
                 new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(ClaimTypes.Role, user.UserRole.ToString())
             };
-
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
             var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -126,9 +112,7 @@ namespace Boi.Net.Services
                 );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-
         }
-
 
         public string CreateRefreshToken()
         {
@@ -139,11 +123,9 @@ namespace Boi.Net.Services
             return Convert.ToBase64String(randomNumber);
         }
 
-
         public async Task<AuthResponseDto> GenerateNewTokens(string oldRefreshToken)
         {
-
-            var user = await _context.Users.FirstOrDefaultAsync(user => user.RefreshToken == oldRefreshToken);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == oldRefreshToken);
 
             if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
@@ -156,9 +138,7 @@ namespace Boi.Net.Services
             user.RefreshToken = newRefreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
 
-            _context.Update(user);
-            await _context.SaveChangesAsync();
-
+            await _userManager.UpdateAsync(user);
 
             return new AuthResponseDto
             {
