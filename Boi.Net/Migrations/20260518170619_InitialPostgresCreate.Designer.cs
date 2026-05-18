@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Boi.Net.Migrations
 {
     [DbContext(typeof(BoiNetDbContext))]
-    [Migration("20260518165241_InitialPostgresCreat")]
-    partial class InitialPostgresCreat
+    [Migration("20260518170619_InitialPostgresCreate")]
+    partial class InitialPostgresCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

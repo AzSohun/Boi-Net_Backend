@@ -1,0 +1,42 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+
+# VS Code/Visual Studio
+.vscode/
+.vs/
+*.user
+*.suo
+*.sln.iml
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if applicable)
+node_modules/
+
+# Environment files (use proper secrets management in Render)
+.env
+.env.local
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Other
+README.md
+.gitattributes
