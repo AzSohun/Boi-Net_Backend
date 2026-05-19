@@ -31,37 +31,24 @@ namespace Boi.Net.Services
                 return false;
             }
 
-            var newUserId = Guid.NewGuid().ToString();
-
             var anyUserExists = await _userManager.Users.AnyAsync();
             bool isFirstUser = !anyUserExists;
 
             var newUser = new User
             {
-                Id = newUserId,
+                Id = Guid.NewGuid().ToString(),
                 Email = registration.Email,
                 UserName = registration.Email,
                 Name = registration.Name,
                 UserRole = isFirstUser ? Role.SuperAdmin : Role.User,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                IsDeleted = false
+                UpdatedAt = DateTime.UtcNow
             };
 
             var result = await _userManager.CreateAsync(newUser, registration.Password);
 
-            if (!result.Succeeded)
-            {
-                return false;
-            }
-
-            string roleToAssign = isFirstUser ? "SuperAdmin" : "User";
-
-            var roleResult = await _userManager.AddToRoleAsync(newUser, roleToAssign);
-
-            return roleResult.Succeeded;
+            return result.Succeeded;
         }
-
 
 
         // Login Service
