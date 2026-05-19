@@ -130,7 +130,8 @@ namespace Boi.Net.Controllers
         }
 
 
-        [Authorize(Roles = "SuperAdmin,Admin")]
+        //[Authorize(Roles = "SuperAdmin,Admin")]
+        [AllowAnonymous]
         [HttpDelete("delete/{id}")]
         public async Task<ActionResult> Delete(int id)
         {
