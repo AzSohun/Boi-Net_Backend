@@ -18,7 +18,29 @@ namespace Boi.Net.Controllers
             _userService = userService;
         }
 
-        // 🚨 নতুন: TanStack Query-এর জন্য GET API
+
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpGet("all-profiles")]
+        public async Task<ActionResult<UserDto[]>> GetAllProfiles()
+        {
+            try
+            {
+                var profiles = await _userService.GetAllProfile();
+
+                if (profiles == null || profiles.Length == 0)
+                {
+                    return Ok(Array.Empty<UserDto>());
+                }
+
+                return Ok(profiles);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "Failed to fetch profiles.", Detail = ex.Message });
+            }
+        }
+
+
         [Authorize]
         [HttpGet("me")]
         public async Task<ActionResult> GetMyProfile()
