@@ -72,7 +72,6 @@ namespace Boi.Net.Controllers
                     return Unauthorized(new { Message = "You are not Authorized" });
                 }
 
-                // 🚨 ফিক্স: আপডেট হওয়া ডেটা ফ্রন্টএন্ডে পাঠানো হচ্ছে
                 var updatedUser = await _userService.MyProfileUpdateAsync(userId, dto);
 
                 return Ok(new
@@ -87,7 +86,7 @@ namespace Boi.Net.Controllers
             }
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpDelete("me")]
         public async Task<IActionResult> DeleteMyProfile()
         {
@@ -102,7 +101,6 @@ namespace Boi.Net.Controllers
 
                 var isDelete = await _userService.SoftDeleteMyAccountAsync(userId);
 
-                // 🚨 ফিক্স: উল্টো লজিক ঠিক করা হয়েছে (!isDelete)
                 if (!isDelete)
                 {
                     return BadRequest(new { Message = "Failed to Delete Successfully." });
