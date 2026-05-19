@@ -56,7 +56,6 @@ namespace Boi.Net.Controllers
             }
 
             return Ok(book);
-
         }
 
 
@@ -72,7 +71,6 @@ namespace Boi.Net.Controllers
             }
 
             return Ok(book);
-
         }
 
 
@@ -104,10 +102,9 @@ namespace Boi.Net.Controllers
 
             await _service.CreateBook(newBook, createBookDto.ImageFile);
 
-
-            return Ok(newBook);
-
+            return CreatedAtAction(nameof(GetById), new {id = newBook.Id}, newBook);
         }
+
 
         [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpPut("update/{id}")]
@@ -125,8 +122,7 @@ namespace Boi.Net.Controllers
 
             await _service.UpdateBook(updatedBook, bookUpdate.ImageFile);
 
-            return Ok(updatedBook);
-            
+            return NoContent();
         }
 
 
@@ -144,10 +140,7 @@ namespace Boi.Net.Controllers
 
             await _service.DeleteBook(book);
 
-            return Ok("Book Has Been Deleted");
-
+            return NoContent();
         }
-
-
     }
 }
