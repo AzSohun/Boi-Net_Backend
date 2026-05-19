@@ -86,7 +86,7 @@ namespace Boi.Net.Controllers
             }
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpDelete("me")]
         public async Task<IActionResult> DeleteMyProfile()
         {
