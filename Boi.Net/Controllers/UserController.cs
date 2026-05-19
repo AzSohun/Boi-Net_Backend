@@ -19,8 +19,7 @@ namespace Boi.Net.Controllers
         }
 
 
-        // [Authorize(Roles = "SuperAdmin,Admin")]
-        [AllowAnonymous]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet("all-profiles")]
         public async Task<ActionResult<UserDto[]>> GetAllProfiles()
         {
