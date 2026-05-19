@@ -53,7 +53,7 @@ namespace Boi.Net.Services
         {
 
             string cacheVersion = await GetBookCacheVersionAsync();
-            string cacheKey = $"BoiNet_Books_{searchTitle}_{filterGenre}_{filterAuthor}_{filterIsbn}_{filterIsAvailable}_{sortBy}_{asc}_{pageCount}_{pageSize}";
+            string cacheKey = $"BoiNet_Books_{cacheVersion}_{searchTitle}_{filterGenre}_{filterAuthor}_{filterIsbn}_{filterIsAvailable}_{sortBy}_{asc}_{pageCount}_{pageSize}";
 
             var cacheBooksString = await _cache.GetStringAsync(cacheKey);
 
