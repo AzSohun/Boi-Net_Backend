@@ -91,7 +91,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://boi-net-frontend-7d72.vercel.app")
+        policy.WithOrigins("https://boi-net-frontend.vercel.app")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
