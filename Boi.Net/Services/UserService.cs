@@ -1,6 +1,8 @@
-﻿using Boi.Net.DTOs.UserDTOs;
+﻿using Boi.Net.DTOs.BookDTOs;
+using Boi.Net.DTOs.UserDTOs;
 using Boi.Net.Model;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Boi.Net.Services
 {
@@ -15,7 +17,40 @@ namespace Boi.Net.Services
             _photoService = photoService;
         }
 
-        // 🚨 নতুন: ফ্রন্টএন্ডের GET রিকোয়েস্টের জন্য প্রোফাইল ফেচ করার মেথড
+
+        public async Task<UserDto[]> GetAllProfile()
+        {
+            var users = await _userManager.Users
+                .AsNoTracking()
+                .Where(u => !u.IsDeleted)
+                .Select(user => new UserDto
+                {
+                    id = Guid.Parse(user.Id),
+                    Email = user.Email!,
+                    Name = user.Name,
+                    ProfilePhotoUrl = user.ProfilePhotoUrl ?? string.Empty,
+                    ProfilePhotoId = user.ProfilePhotoId ?? string.Empty,
+                    DOB = user.DOB,
+                    UserRole = user.UserRole,
+
+                    Wishlist = user.Wishlist != null
+                        ? user.Wishlist.Select(b => new BookDto
+                        {
+                            Id = b.Id,
+                            Title = b.Title,
+                            Author = b.Author,
+                            Price = b.Price,
+                            CoverPhoto = b.CoverPhoto
+
+                        }).ToList()
+                        : new List<BookDto>()
+                })
+                .ToArrayAsync();
+
+            return users;
+        }
+
+
         public async Task<UserProfileResponseDto> GetMyProfileAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
