@@ -18,12 +18,7 @@ namespace Boi.Net.Model
 
         public Role UserRole { get; set; } = Role.User;
 
-        // EF Core doen't support array directly in the database.
-        // Here ICollection is the solution of create Many-to-Many relational table.
         public ICollection<Book> Wishlist { get; set; } = new List<Book>();
-
-        // TODO:
-        // public ICollection<Order> Orders { get; set; } = new List<Order>();
 
         public bool IsBlocked { get; set; } = false;
 
