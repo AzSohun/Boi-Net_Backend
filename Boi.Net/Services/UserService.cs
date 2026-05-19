@@ -169,19 +169,19 @@ namespace Boi.Net.Services
             return result.Succeeded;
         }
 
-        // All User Deletation (Test Purpose)
-        public async Task<bool> HardClearUserTableAsync()
-        {
-            var allUsers = await _userManager.Users.ToListAsync();
+        // All User Deletation (Test Purpose) - Let it stay here
+        //public async Task<bool> HardClearUserTableAsync()
+        //{
+        //    var allUsers = await _userManager.Users.ToListAsync();
 
-            if (allUsers.Count == 0) return false;
+        //    if (allUsers.Count == 0) return false;
 
-            foreach (var user in allUsers)
-            {
-                await _userManager.DeleteAsync(user);
-            }
+        //    foreach (var user in allUsers)
+        //    {
+        //        await _userManager.DeleteAsync(user);
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
     }
 }

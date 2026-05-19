@@ -19,7 +19,7 @@ namespace Boi.Net.Controllers
         }
 
 
-        //[Authorize(Roles = "SuperAdmin,Admin")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet("all-profiles")]
         public async Task<ActionResult<UserDto[]>> GetAllProfiles()
         {
@@ -143,26 +143,26 @@ namespace Boi.Net.Controllers
         }
 
 
-        // All User Deletation (Testing Purpose)
-        [AllowAnonymous]
-        [HttpDelete("clear-all-users-completely")]
-        public async Task<IActionResult> ClearAllUsersCompletely()
-        {
-            try
-            {
-                var isCleared = await _userService.HardClearUserTableAsync();
+        // All User Deletation (Testing Purpose) - Let stay here
+        //[AllowAnonymous]
+        //[HttpDelete("clear-all-users-completely")]
+        //public async Task<IActionResult> ClearAllUsersCompletely()
+        //{
+        //    try
+        //    {
+        //        var isCleared = await _userService.HardClearUserTableAsync();
 
-                if (!isCleared)
-                {
-                    return BadRequest(new { Message = "User table is already empty." });
-                }
+        //        if (!isCleared)
+        //        {
+        //            return BadRequest(new { Message = "User table is already empty." });
+        //        }
 
-                return Ok(new { Message = "User table has been completely wiped out! Go ahead and register your fresh SuperAdmin." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = "Failed to clear table.", Detail = ex.Message });
-            }
-        }
+        //        return Ok(new { Message = "User table has been completely wiped out! Go ahead and register your fresh SuperAdmin." });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { Message = "Failed to clear table.", Detail = ex.Message });
+        //    }
+        //}
     }
 }
