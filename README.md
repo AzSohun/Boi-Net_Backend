@@ -308,6 +308,7 @@ All user passwords must meet the following criteria:
 ### User Roles
 
 - **User** - Standard user with order and profile management access
+- **Super Admin** - Supreme Administrative access to book management and user and admin administration
 - **Admin** - Administrative access to book management and user administration
 
 ## 🗄️ Database Architecture
