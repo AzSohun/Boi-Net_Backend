@@ -26,27 +26,43 @@ namespace Boi.Net.Services
         public async Task<bool> Registration(RegistrationDto registration)
         {
             var isUserExist = await _userManager.FindByEmailAsync(registration.Email);
-
             if (isUserExist != null)
             {
                 return false;
             }
+
+            var newUserId = Guid.NewGuid().ToString();
 
             var anyUserExists = await _userManager.Users.AnyAsync();
             bool isFirstUser = !anyUserExists;
 
             var newUser = new User
             {
+                Id = newUserId,
                 Email = registration.Email,
-                UserName = registration.Email, 
+                UserName = registration.Email,
                 Name = registration.Name,
-                UserRole = isFirstUser ? Role.SuperAdmin : Role.User
+                UserRole = isFirstUser ? Role.SuperAdmin : Role.User,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                IsDeleted = false
             };
 
             var result = await _userManager.CreateAsync(newUser, registration.Password);
 
-            return result.Succeeded;
+            if (!result.Succeeded)
+            {
+                return false;
+            }
+
+            string roleToAssign = isFirstUser ? "SuperAdmin" : "User";
+
+            var roleResult = await _userManager.AddToRoleAsync(newUser, roleToAssign);
+
+            return roleResult.Succeeded;
         }
+
+
 
         // Login Service
         public async Task<AuthResponseDto> Login(LoginDto loginDto)
