@@ -130,7 +130,7 @@ namespace Boi.Net.Services
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == oldRefreshToken);
 
-            if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (user == null || !user.RefreshTokenExpiryTime.HasValue || user.RefreshTokenExpiryTime.Value <= DateTime.UtcNow)
             {
                 return null!;
             }
@@ -150,7 +150,7 @@ namespace Boi.Net.Services
                     Id = user.Id,
                     Name = user.Name,
                     Email = user.Email,
-                    Role = user.UserRole
+                    Role = user.UserRole.ToString()
                 },
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken
